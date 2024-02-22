@@ -1,14 +1,21 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <map>
 
+#include "common.h"
 #include "instructions.h"
 
 struct TMemory {
-    std::map<uint32_t, TAddress> memory;
+    std::vector<uint8_t> data;
+    std::map<uint32_t, TInstruction> instructions;
+
+    void InitRAM(uint32_t size) {
+        data = std::vector<uint8_t>(size, 0);
+    }
 
     void LoadROM(const char path[]) {
         std::cout << "Loading " << path << "..." << std::endl;
@@ -30,18 +37,18 @@ struct TMemory {
 
         auto addr = strip(tokens[0]);
         addr.pop_back();
-        auto numeric_addr = hex2int(addr);
+        uint32_t numeric_addr = hex2int(addr);
 
-        auto data = strip(tokens[1]);
+        auto bytes = strip(tokens[1]);
         std::string instr;
-        if (data.find('\t') != std::string::npos) {
-            tokens = split(data, '\t', 1);
-            data = strip(tokens[0]);
+        if (bytes.find('\t') != std::string::npos) {
+            tokens = split(bytes, '\t', 1);
+            bytes = strip(tokens[0]);
             instr = strip(tokens[1]);
         }
 
-        for (const auto& word : split(data, ' ')) {
-            std::optional<TInstruction> instruction;
+        for (const auto& word : split(bytes, ' ')) {
+            TInstruction instruction{};
             if (!instr.empty()) {
                 std::string cmd = instr;
                 std::vector<std::unique_ptr<TArg>> args;
@@ -62,30 +69,18 @@ struct TMemory {
                 }
 
                 instruction = {
-                    static_cast<uint32_t>(2 * split(data, ' ').size()),
+                    static_cast<uint8_t>(2 * split(bytes, ' ').size()),
                     cmd,
                     std::move(args)
                 };
                 instr = "";
             }
 
-            TAddress address = {
-                {
-                    static_cast<uint8_t>(hex2int(word.substr(0, 2))), 
-                    static_cast<uint8_t>(hex2int(word.substr(2, 2)))
-                }, 
-                std::move(instruction)
-            };
-            memory[numeric_addr] = std::move(address);
+            data[numeric_addr] = static_cast<uint8_t>(hex2int(word.substr(0, 2)));
+            data[numeric_addr + 1] = static_cast<uint8_t>(hex2int(word.substr(2, 2)));
+            instructions[numeric_addr] = std::move(instruction);
             numeric_addr += 2;
         }
     }
 
-    void InitRAM(uint32_t size) {
-        auto addr = memory.rbegin()->first + 2;
-        for (uint32_t i = 0; i < size; i += 2) {
-            memory[addr] = TAddress{};
-            addr += 2;
-        }
-    }
 };

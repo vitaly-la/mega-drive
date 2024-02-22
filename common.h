@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <vector>
 
 uint32_t hex2int(const std::string& hex) {
     uint32_t x;
@@ -14,10 +15,10 @@ std::vector<std::string> split(const std::string& src, char delim, ssize_t maxsp
     std::vector<std::string> tokens;
     std::stringstream ss{src};
     std::string token;
-    size_t cnt{};
+    ssize_t cnt{};
     while (std::getline(ss, token, delim)) {
         if (maxsplit != -1 && cnt >= maxsplit) {
-            if (ss.tellg() != std::string::npos) {
+            if (ss.tellg() != -1) {
                 token += delim + ss.str().substr(ss.tellg());
             }
             tokens.push_back(token);
