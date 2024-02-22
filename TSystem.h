@@ -7,16 +7,38 @@
 struct TMemory;
 struct TProcessor;
 
-struct TArg {};
+/*================ ARGUMENT TYPES ================*/
+
+struct TArg {
+    virtual std::string Str() const = 0;
+    virtual ~TArg() {}
+};
 
 struct TAddressArg : TArg {
     uint32_t addr;
     explicit TAddressArg(uint32_t addr) : TArg{}, addr{addr} {}
+    std::string Str() const override {
+        std::stringstream ss;
+        ss << std::hex << addr;
+        return ss.str();
+    }
 };
+
+struct TLiteralArg : TArg {
+    uint32_t value;
+    explicit TLiteralArg(uint32_t value) : TArg{}, value{value} {}
+    std::string Str() const override {
+        std::stringstream ss;
+        ss << std::hex << value;
+        return ss.str();
+    }
+};
+
+/*================ SYSTEM COMPONENTS ================*/
 
 struct TInstruction {
     uint32_t size;
-    TString cmd;
+    std::string cmd;
     std::vector<std::unique_ptr<TArg>> args;
 };
 
@@ -25,7 +47,7 @@ struct TAddress {
     std::optional<TInstruction> instruction;
 };
 
-void process_instruction(const TInstruction&, TMemory&, TProcessor&);
+void process_instruction(const TInstruction&, std::map<uint32_t, TAddress>&, TProcessor&);
 
 struct TProcessor {
     uint32_t pc;
@@ -44,7 +66,7 @@ struct TProcessor {
         ssp{}
     {}
 
-    void run(const TInstruction& instruction, TMemory& memory) {
-        process_instruction(instruction, memory, *this);
+    void run(const TInstruction& instruction, std::map<uint32_t, TAddress>& ram) {
+        process_instruction(instruction, ram, *this);
     }
 };

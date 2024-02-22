@@ -6,6 +6,7 @@ int main() {
     try {
         TMemory memory;
         memory.LoadROM("test.asm");
+        memory.InitRAM(1 << 24);
 
         TProcessor processor{0x200};
 
@@ -21,7 +22,7 @@ int main() {
                 throw std::runtime_error("Invalid instruction.");
             }
 
-            processor.run(*instruction, memory);
+            processor.run(*instruction, memory.memory);
         }
     } catch (std::runtime_error& e) {
         std::cout << e.what() << std::endl;
