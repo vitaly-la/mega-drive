@@ -48,9 +48,13 @@ struct TArg {
     bool dec;
     bool pc;
 
-    uint32_t Addr() const {
+    uint32_t Addr(const TProcessor& proc) const {
         if (addr) {
             return *addr;
+        }
+
+        if (pc) {
+            return proc.pc;
         }
 
         throw std::runtime_error("Unsupported operand.");
@@ -75,11 +79,13 @@ struct TArg {
         throw std::runtime_error("Unsupported operand.");
     }
 
-    void Write(ESize sz, uint32_t value, TProcessor& proc, std::vector<uint8_t>& ram) {
+    void Write(ESize sz, uint32_t value, TProcessor& proc, std::vector<uint8_t>& ram) const {
         if (direct) {
             proc.reg[*direct] = value;
         }
 
-        throw std::runtime_error("Unsupported operand.");
+        else {
+            throw std::runtime_error("Unsupported operand.");
+        }
     }
 };
