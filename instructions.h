@@ -30,38 +30,27 @@ TArg parse_arg(const std::string& arg) {
     return parsed;
 }
 
-void process_instruction(const TInstruction& instruction, std::vector<uint8_t>& ram, TProcessor& proc) {
-    std::cout << std::hex << proc.pc << ": " << instruction.cmd << " ";
-    for (size_t i = 0; i < instruction.args.size(); ++i) {
-        auto arg = instruction.args[i];
-        if (arg.addr) {
-            std::cout << "0x" << std::hex << *arg.addr;
-        } else {
-            std::cout << "#" << std::dec << *arg.imm;
-        }
-        if (i < instruction.args.size() - 1) {
-            std::cout << ",";
-        }
-    }
-    std::cout << std::endl << "SR: " << std::bitset<16>(proc.sr) << std::endl << std::endl;
+void process_instruction(const TInstruction& instr, TProcessor& proc, std::vector<uint8_t>& ram) {
+    std::cout
+        << std::hex << proc.pc << ": " << instr.text << std::endl
+        << "SR: " << std::bitset<16>(proc.sr) << std::endl << std::endl;
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    if (instruction.cmd == "nop") {
-        proc.pc += instruction.size;
+    if (instr.cmd == "nop") {
+        proc.pc += instr.size;
     }
 
-    else if (instruction.cmd == "jmp") {
-        proc.pc = *instruction.args[0].addr;
+    else if (instr.cmd == "jmp") {
+        proc.pc = instr.args[0].Addr();
     }
 
-    else if (instruction.cmd == "tstl") {
-        auto addr = *instruction.args[0].addr;
+    else if (instr.cmd.rfind("tst", 0) == 0) {
+        auto sz{ESize::B};
+        if (instr.cmd[3] == 'w') sz = ESize::W;
+        if (instr.cmd[3] == 'l') sz = ESize::L;
 
-        uint32_t value = ram[addr + 3] << 24 |
-                         ram[addr + 2] << 16 |
-                         ram[addr + 1] << 8 |
-                         ram[addr];
+        auto value = instr.args[0].Value(sz, ram);
 
         if (value == 0) {
             proc.sr |= Z_FLAG;
@@ -71,14 +60,14 @@ void process_instruction(const TInstruction& instruction, std::vector<uint8_t>& 
 
         proc.sr &= ~C_FLAG & ~V_FLAG & ~N_FLAG;
         
-        proc.pc += instruction.size;
+        proc.pc += instr.size;
     }
 
-    else if (instruction.cmd == "bnes") {
+    else if (instr.cmd == "bnes") {
         if (proc.sr & Z_FLAG) {
-            proc.pc += instruction.size;
+            proc.pc += instr.size;
         } else {
-            proc.pc = *instruction.args[0].addr;
+            proc.pc = instr.args[0].Addr();
         }
     }
 

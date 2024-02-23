@@ -70,6 +70,7 @@ struct TMemory {
 
                 instruction = {
                     static_cast<uint8_t>(2 * split(bytes, ' ').size()),
+                    instr,
                     cmd,
                     std::move(args)
                 };
