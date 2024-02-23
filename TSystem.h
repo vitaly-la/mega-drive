@@ -1,35 +1,21 @@
 #pragma once
 
-#include <memory>
 #include <string>
 
 struct TProcessor;
 
 /*================ ARGUMENT TYPES ================*/
 
+enum struct EArgType {
+    Immediate,
+    Address,
+    Unknown
+};
+
 struct TArg {
-    virtual std::string Str() const = 0;
-    virtual ~TArg() {}
-};
-
-struct TImmediateArg : TArg {
-    uint32_t imm;
-    explicit TImmediateArg(uint32_t imm) : TArg{}, imm{imm} {}
-    std::string Str() const override {
-        std::stringstream ss;
-        ss << "#" << imm;
-        return ss.str();
-    }
-};
-
-struct TAddressArg : TArg {
+    EArgType type;
+    uint32_t value;
     uint32_t addr;
-    explicit TAddressArg(uint32_t addr) : TArg{}, addr{addr} {}
-    std::string Str() const override {
-        std::stringstream ss;
-        ss << "0x" << std::hex << addr;
-        return ss.str();
-    }
 };
 
 /*================ SYSTEM COMPONENTS ================*/
@@ -37,7 +23,7 @@ struct TAddressArg : TArg {
 struct TInstruction {
     uint8_t size;
     std::string cmd;
-    std::vector<std::unique_ptr<TArg>> args;
+    std::vector<TArg> args;
 };
 
 void process_instruction(const TInstruction&, std::vector<uint8_t>&, TProcessor&);

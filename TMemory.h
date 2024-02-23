@@ -50,8 +50,8 @@ struct TMemory {
         for (const auto& word : split(bytes, ' ')) {
             TInstruction instruction{};
             if (!instr.empty()) {
-                std::string cmd = instr;
-                std::vector<std::unique_ptr<TArg>> args;
+                std::string cmd{instr};
+                std::vector<TArg> args;
                 if (instr.find(' ') != std::string::npos) {
                     auto instr_tokens = split(instr, ' ', 1);
                     cmd = instr_tokens[0];
