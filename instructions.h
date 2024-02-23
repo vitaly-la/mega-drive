@@ -13,29 +13,31 @@ constexpr uint16_t N_FLAG{ 1 << 3 };
 constexpr uint16_t X_FLAG{ 1 << 4 };
 
 TArg parse_arg(const std::string& arg) {
-    if (arg.rfind("#", 0) == 0) {
-        return TArg{
-            EArgType::Immediate, 
-            static_cast<uint32_t>(std::stoi(arg.substr(1))), 
-            {}
-        };
+    TArg parsed{};
+
+    if (arg.rfind("%", 0) == 0) {
+        //
     }
 
-    if (arg.rfind("0x", 0) == 0) {
-        return TArg{EArgType::Address, {}, hex2int(arg)};
+    else if (arg.rfind("0x", 0) == 0) {
+        parsed.addr = hex2int(arg);
     }
 
-    return TArg{EArgType::Unknown, {}, {}};
+    else if (arg.rfind("#", 0) == 0) {
+        parsed.imm = std::stoi(arg.substr(1));
+    }
+
+    return parsed;
 }
 
 void process_instruction(const TInstruction& instruction, std::vector<uint8_t>& ram, TProcessor& proc) {
     std::cout << std::hex << proc.pc << ": " << instruction.cmd << " ";
     for (size_t i = 0; i < instruction.args.size(); ++i) {
         auto arg = instruction.args[i];
-        if (arg.type == EArgType::Immediate) {
-            std::cout << "#" << std::dec << arg.value;
+        if (arg.addr) {
+            std::cout << "0x" << std::hex << *arg.addr;
         } else {
-            std::cout << "0x" << std::hex << arg.addr;
+            std::cout << "#" << std::dec << *arg.imm;
         }
         if (i < instruction.args.size() - 1) {
             std::cout << ",";
@@ -50,11 +52,11 @@ void process_instruction(const TInstruction& instruction, std::vector<uint8_t>& 
     }
 
     else if (instruction.cmd == "jmp") {
-        proc.pc = instruction.args[0].addr;
+        proc.pc = *instruction.args[0].addr;
     }
 
     else if (instruction.cmd == "tstl") {
-        auto addr = instruction.args[0].addr;
+        auto addr = *instruction.args[0].addr;
 
         uint32_t value = ram[addr + 3] << 24 |
                          ram[addr + 2] << 16 |
@@ -76,7 +78,7 @@ void process_instruction(const TInstruction& instruction, std::vector<uint8_t>& 
         if (proc.sr & Z_FLAG) {
             proc.pc += instruction.size;
         } else {
-            proc.pc = instruction.args[0].addr;
+            proc.pc = *instruction.args[0].addr;
         }
     }
 

@@ -1,21 +1,24 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 struct TProcessor;
 
 /*================ ARGUMENT TYPES ================*/
 
-enum struct EArgType {
-    Immediate,
-    Address,
-    Unknown
-};
-
 struct TArg {
-    EArgType type;
-    uint32_t value;
-    uint32_t addr;
+    std::optional<uint8_t> direct;
+    std::optional<uint8_t> indirect;
+    std::optional<uint32_t> disp;
+    std::optional<uint8_t> idx;
+    std::optional<uint32_t> addr;
+    std::optional<uint32_t> imm;
+    bool inc;
+    bool dec;
+    bool pc;
+
+    // Methods
 };
 
 /*================ SYSTEM COMPONENTS ================*/
@@ -31,14 +34,12 @@ void process_instruction(const TInstruction&, std::vector<uint8_t>&, TProcessor&
 struct TProcessor {
     uint32_t pc;
     uint16_t sr;
-    uint32_t d[8];
-    uint32_t a[8];
+    uint32_t reg[16];
 
     explicit TProcessor(uint32_t pc) :
         pc{pc},
         sr{},
-        d{},
-        a{}
+        reg{}
     {}
 
     void run(const TInstruction& instruction, std::vector<uint8_t>& ram) {
