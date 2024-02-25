@@ -1,22 +1,21 @@
+#include <iostream>
+#include <memory>
+
 #include "TMemory.h"
+#include "TROM.h"
+#include "TRAM.h"
+#include "TM68k.h"
 
 int main() {
     try {
-        TMemory memory;
-        memory.InitRAM(1 << 24);
-        memory.LoadROM("test.asm");
+        auto memory = std::make_unique<TMemory>();
 
-        TProcessor processor{0x200};
+        memory->Connect(std::make_unique<TROM>("rom.bin"));
+        memory->Connect(std::make_unique<TRAM>(0xFF0000, 0x10000));
 
-        std::cout << "Starting CPU..." << std::endl << std::endl;
+        TM68k m68k{std::move(memory), "rom.asm"};
 
-        for (;;) {
-            const auto& instruction = memory.instructions.at(processor.pc);
-            processor.run(instruction, memory.data);
-        }
-    } catch (std::out_of_range&) {
-        std::cout << "Invalid instruction." << std::endl;
-        return EXIT_FAILURE;
+        m68k.Run();
     } catch (std::runtime_error& e) {
         std::cout << e.what() << std::endl;
         return EXIT_FAILURE;

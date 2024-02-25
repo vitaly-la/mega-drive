@@ -1,17 +1,8 @@
 #pragma once
 
 #include <sstream>
-#include <vector>
 
-uint32_t hex2int(const std::string& hex) {
-    uint32_t x;
-    std::stringstream ss;
-    ss << std::hex << hex;
-    ss >> x;
-    return x;
-}
-
-std::vector<std::string> split(const std::string& src, char delim, ssize_t maxsplit = -1) {
+std::vector<std::string> Split(const std::string& src, char delim, ssize_t maxsplit = -1) {
     std::vector<std::string> tokens;
     std::stringstream ss{src};
     std::string token;
@@ -30,11 +21,10 @@ std::vector<std::string> split(const std::string& src, char delim, ssize_t maxsp
     return tokens;
 }
 
-std::string strip(const std::string& src) {
-    size_t start = src.find_first_not_of(" \t\n\r\f\v");
-    size_t end = src.find_last_not_of(" \t\n\r\f\v");
-    if (start == std::string::npos || end == std::string::npos) {
-        return "";
-    }
-    return src.substr(start, end - start + 1);
+uint32_t Hex2int(const std::string& hex) {
+    uint32_t x;
+    std::stringstream ss;
+    ss << std::hex << hex;
+    ss >> x;
+    return x;
 }

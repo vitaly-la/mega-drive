@@ -34,5 +34,4 @@
 main
 
 # Assembly
-*.s
 *.asm
