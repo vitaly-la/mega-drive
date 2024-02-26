@@ -1,22 +1,22 @@
 #pragma once
 
 struct TM68k {
-    std::unique_ptr<TMemory> Memory;
-    std::map<uint32_t, std::string> Instructions;
-    uint32_t Reg[16];
-    uint32_t SSP;
-    uint32_t PC;
-    uint16_t SR;
+    TMemory Memory;
+    std::map<u32, std::string> Instructions;
+    u32 Reg[16];
+    u32 SSP;
+    u32 PC;
+    u16 SR;
 
-    TM68k(std::unique_ptr<TMemory> memory, const std::string& asmFile) : 
+    TM68k(TMemory memory, const std::string& asmFile) : 
         Memory{std::move(memory)},
         Reg{},
         SR{}
     {
         ReadInstructions(asmFile);
 
-        SSP = Memory->Read32(0x0);
-        PC = Memory->Read32(0x4);
+        SSP = Memory.Read<u32>(0x0);
+        PC = Memory.Read<u32>(0x4);
     }
 
     void Run() {
@@ -37,7 +37,7 @@ struct TM68k {
             ) {
                 auto tokens = Split(line, '\t');
                 if (tokens.size() >= 3) {
-                    uint32_t addr = Hex2int(tokens[0]);
+                    u32 addr = Hex2int(tokens[0]);
                     Instructions[addr] = tokens[2];
                 }
             }

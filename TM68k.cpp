@@ -1,10 +1,3 @@
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <vector>
-
 #include "common.h"
 
 #include "TMemory.h"
@@ -13,7 +6,7 @@
 void TM68k::ProcessInstruction() {
     std::cout << std::hex << PC << ": " << Instructions[PC] << std::endl;
 
-    if (Memory->Read32(PC) == 0x4e71) { // NOP
+    if (Memory.Read<u16>(PC) == 0x4e71) { // NOP
         PC += 2;
     }
 

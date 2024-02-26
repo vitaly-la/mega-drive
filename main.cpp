@@ -1,10 +1,3 @@
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <vector>
-
 #include "common.h"
 
 #include "TMemory.h"
@@ -14,10 +7,10 @@
 
 int main() {
     try {
-        auto memory = std::make_unique<TMemory>();
+        TMemory memory;
 
-        memory->Connect(std::make_unique<TROM>("rom.bin"));
-        memory->Connect(std::make_unique<TRAM>(0xFF0000, 0x10000));
+        memory.Connect(TROM{"rom.bin"});
+        memory.Connect(TRAM{0xFF0000, 0x10000});
 
         TM68k m68k{std::move(memory), "rom.asm"};
 
