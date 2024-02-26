@@ -1,6 +1,13 @@
 #pragma once
 
+enum struct EStatus {
+    Init,
+    Running,
+    Stopped
+};
+
 struct TM68k {
+    EStatus Status;
     TMemory Memory;
     std::map<u32, std::string> Instructions;
     u32 Reg[16];
@@ -9,6 +16,7 @@ struct TM68k {
     u16 SR;
 
     TM68k(TMemory memory, const std::string& asmFile) : 
+        Status{EStatus::Init},
         Memory{std::move(memory)},
         Reg{},
         SR{}
@@ -20,7 +28,8 @@ struct TM68k {
     }
 
     void Run() {
-        for (;;) {
+        Status = EStatus::Running;
+        while (Status == EStatus::Running) {
             ProcessInstruction();
         }
     }
