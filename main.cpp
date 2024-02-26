@@ -1,5 +1,11 @@
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
+#include <sstream>
+#include <vector>
+
+#include "common.h"
 
 #include "TMemory.h"
 #include "TROM.h"

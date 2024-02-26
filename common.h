@@ -1,8 +1,6 @@
 #pragma once
 
-#include <sstream>
-
-std::vector<std::string> Split(const std::string& src, char delim, ssize_t maxsplit = -1) {
+inline std::vector<std::string> Split(const std::string& src, char delim, ssize_t maxsplit = -1) {
     std::vector<std::string> tokens;
     std::stringstream ss{src};
     std::string token;
@@ -21,7 +19,7 @@ std::vector<std::string> Split(const std::string& src, char delim, ssize_t maxsp
     return tokens;
 }
 
-uint32_t Hex2int(const std::string& hex) {
+inline uint32_t Hex2int(const std::string& hex) {
     uint32_t x;
     std::stringstream ss;
     ss << std::hex << hex;

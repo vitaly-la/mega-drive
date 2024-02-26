@@ -1,10 +1,7 @@
 #pragma once
 
-#include <fstream>
-#include <string>
-
 struct TROM : TDevice {
-    explicit TROM(const std::string& binFile) : TDevice{0} {
+    explicit TROM(const std::string& binFile) : TDevice{0x0} {
         std::ifstream input{binFile, std::ios::binary};
         std::copy(
             std::istreambuf_iterator<char>{input},

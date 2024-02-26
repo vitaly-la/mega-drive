@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 struct TDevice {
     uint32_t Offset;
     std::vector<uint8_t> Memory;
@@ -29,7 +27,12 @@ struct TMemory {
 
     uint32_t Read32(uint32_t addr) const {
         for (const auto& device : Devices) {
-            if (device->HasAddr(addr)) {
+            if (
+                device->HasAddr(addr) && 
+                device->HasAddr(addr + 1) && 
+                device->HasAddr(addr + 2) && 
+                device->HasAddr(addr + 3)
+            ) {
                 return device->Read32(addr);
             }
         }
