@@ -6,14 +6,19 @@
 void TM68k::ProcessInstruction() {
     std::cout << std::hex << PC << ": " << Instructions[PC] << std::endl;
 
-    if (Memory.Read<u16>(PC) == 0x4e71) { // NOP
+    u16 opcode = Memory.Read<u16>(PC);
+    PC += 2;
+
+    if (opcode == 0x4e71) {} // NOP
+
+    else if (opcode == 0x4e72) { // STOP
+        SR = Memory.Read<u16>(PC);
         PC += 2;
+        Status = EStatus::Stopped;
     }
 
-    else if (Memory.Read<u16>(PC) == 0x4e72) { // STOP
-        SR = Memory.Read<u16>(PC + 2);
-        PC += 4;
-        Status = EStatus::Stopped;
+    else if ((opcode & 0xffc0) == 0x4ec0) { // JMP
+        PC = Memory.Read<u32>(PC);
     }
 
     else {
