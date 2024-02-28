@@ -9,7 +9,27 @@ void TM68k::ProcessInstruction() {
     u16 opcode = Memory.Read<u16>(PC);
     PC += 2;
 
-    if (opcode == 0x4e71) {} // NOP
+    if (opcode == 0x003c) { // ORI to CCR
+        SR |= Memory.Read<u8>(PC);
+        PC += 1;
+    }
+
+    else if (opcode == 0x007c) { // ORI to SR
+        SR |= Memory.Read<u16>(PC);
+        PC += 2;
+    }
+
+    else if (opcode == 0x023c) { // ANDI to CCR
+        SR &= Memory.Read<u8>(PC);
+        PC += 1;
+    }
+
+    else if (opcode == 0x027c) { // ANDI to SR
+        SR &= Memory.Read<u16>(PC);
+        PC += 2;
+    }
+
+    else if (opcode == 0x4e71) {} // NOP
 
     else if (opcode == 0x4e72) { // STOP
         SR = Memory.Read<u16>(PC);
