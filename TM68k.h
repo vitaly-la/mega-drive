@@ -27,15 +27,6 @@ struct TM68k {
         PC = Memory.Read<u32>(0x4);
     }
 
-    void Run() {
-        Status = EStatus::Running;
-        while (Status == EStatus::Running) {
-            ProcessInstruction();
-        }
-    }
-
-    void ProcessInstruction();
-
     void ReadInstructions(const std::string& asmFile) {
         std::ifstream input{asmFile, std::ios::binary};
         std::string line;
@@ -51,5 +42,21 @@ struct TM68k {
                 }
             }
         }
+    }
+
+    void Run() {
+        Status = EStatus::Running;
+        while (Status == EStatus::Running) {
+            ProcessInstruction();
+        }
+    }
+
+    void ProcessInstruction();
+
+    template<class T>
+    T Read() {
+        auto value = Memory.Read<T>(PC);
+        PC += sizeof(T) / sizeof(u8);
+        return value;
     }
 };

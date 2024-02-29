@@ -19,17 +19,13 @@ struct TDevice {
     bool HasAddr(u32 addr) const {
         CheckType<T>();
 
-        if constexpr (std::is_same<T, u8>::value) {
-            return Offset <= addr && addr < Offset + Memory.size();
-        } else if (std::is_same<T, u16>::value) {
-            return Offset <= addr && addr < Offset + Memory.size() &&
-                   Offset <= addr + 1 && addr + 1 < Offset + Memory.size();
-        } else {
-            return Offset <= addr && addr < Offset + Memory.size() &&
-                   Offset <= addr + 1 && addr + 1 < Offset + Memory.size() &&
-                   Offset <= addr + 2 && addr + 2 < Offset + Memory.size() &&
-                   Offset <= addr + 3 && addr + 3 < Offset + Memory.size();
+        for (size_t i = 0; i < sizeof(T) / sizeof(u8); ++i) {
+            if (addr + i < Offset || addr + i >= Offset + Memory.size()) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     template<class T>
@@ -80,8 +76,6 @@ struct TMemory {
 
     template<class T>
     T Read(u32 addr) const {
-        CheckType<T>();
-
         for (const auto& device : Devices) {
             if (device.HasAddr<T>(addr)) {
                 return device.Read<T>(addr);
@@ -93,8 +87,6 @@ struct TMemory {
 
     template<class T>
     void Write(u32 addr, T value) {
-        CheckType<T>();
-
         for (auto& device : Devices) {
             if (device.HasAddr<T>(addr)) {
                 device.Write<T>(addr, value);
