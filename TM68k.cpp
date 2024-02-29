@@ -8,35 +8,38 @@ void TM68k::ProcessInstruction() {
 
     u16 opcode = Read<u16>();
 
-    if (opcode == 0x003c) { // ORI to CCR
-        SR |= Read<u8>();
+    switch (opcode) {
+        case 0x003c: // ORI to CCR
+            SR |= Read<u8>();
+            return;
+        case 0x007c: // ORI to SR
+            SR |= Read<u16>();
+            return;
+        case 0x023c: // ANDI to CCR
+            SR &= Read<u8>();
+            return;
+        case 0x027c: // ANDI to SR
+            SR &= Read<u16>();
+            return;
+        case 0x0a3c: // EORI to CCR
+            SR ^= Read<u8>();
+            return;
+        case 0x0a7c: // EORI to SR
+            SR ^= Read<u16>();
+            return;
+        case 0x4e71: // NOP
+            return;
+        case 0x4e72: // STOP
+            SR = Read<u16>();
+            Status = EStatus::Stopped;
+            return;
     }
 
-    else if (opcode == 0x007c) { // ORI to SR
-        SR |= Read<u16>();
-    }
-
-    else if (opcode == 0x023c) { // ANDI to CCR
-        SR &= Read<u8>();
-    }
-
-    else if (opcode == 0x027c) { // ANDI to SR
-        SR &= Read<u16>();
-    }
-
-    else if (opcode == 0x4e71) {} // NOP
-
-    else if (opcode == 0x4e72) { // STOP
-        SR = Read<u16>();
-        Status = EStatus::Stopped;
-    }
-
-    else if ((opcode & 0xffc0) == 0x4ec0) { // JMP
+    if ((opcode & 0xffc0) == 0x4ec0) { // JMP
         PC = Read<u32>();
         // Other addressing modes
+        return;
     }
 
-    else {
-        throw std::runtime_error("Unsupported instruction.");
-    }
+    throw std::runtime_error("Unsupported instruction.");
 }
