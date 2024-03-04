@@ -2,6 +2,7 @@
 
 #include "TMemory.h"
 #include "TM68k.h"
+#include "opcodes.h"
 
 void TM68k::ProcessInstruction() {
     std::cout << std::hex << PC << ": " << Instructions.at(PC) << std::endl;
@@ -33,6 +34,11 @@ void TM68k::ProcessInstruction() {
             SR = Read<u16>();
             Status = EStatus::Stopped;
             return;
+    }
+
+    if ((opcode & 0xff00) == 0x4a00) { // TST
+        auto size = GetSize(opcode);
+        return;
     }
 
     if ((opcode & 0xffc0) == 0x4ec0) { // JMP
