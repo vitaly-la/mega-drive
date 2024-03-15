@@ -14,11 +14,11 @@ int main() {
 
         TM68k m68k{std::move(memory), "rom.asm"};
 
-        std::cout << "Starting M68k..." << std::endl;
+        std::cout << "Starting M68k...\n";
         m68k.Run();
-        std::cout << "M68k stopped." << std::endl;
+        std::cout << "M68k stopped.\n";
     } catch (std::runtime_error& e) {
-        std::cout << e.what() << std::endl;
+        std::cout << e.what() << "\n";
         return EXIT_FAILURE;
     }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 enum struct ESize {
     Byte,
     Word,
@@ -8,14 +10,14 @@ enum struct ESize {
 
 ESize GetSize(u16 opcode) {
     switch (opcode & 0xc0) {
-        case 0x0:
-            return ESize::Byte;
-        case 0x40:
-            return ESize::Word;
-        case 0x80:
-            return ESize::Long;
-        default:
-            throw std::runtime_error("Wrong size code.");
+    case 0x0:
+        return ESize::Byte;
+    case 0x40:
+        return ESize::Word;
+    case 0x80:
+        return ESize::Long;
+    default:
+        throw std::runtime_error("Wrong size code.");
     }
 }
 
@@ -36,9 +38,18 @@ enum struct EAddrMode {
 
 EAddrMode GetAddrMode(u16 opcode) {
     switch ((opcode & 0x0038) >> 3) {
-        case 0x0:
-            return EAddrMode::DataReg;
-        default:
-            throw std::runtime_error("Wrong addressing mode.");
+    case 0x0:
+        return EAddrMode::DataReg;
+    default:
+        throw std::runtime_error("Wrong addressing mode.");
     }
+}
+
+struct O;
+
+struct I;
+
+template<class... Args>
+void Process(u16 opcode, std::function<void()> process) {
+    process();
 }
