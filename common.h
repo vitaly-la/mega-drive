@@ -1,10 +1,10 @@
 #pragma once
 
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <sstream>
-#include <vector>
 
 using u8 = uint8_t;
 using u16 = uint16_t;

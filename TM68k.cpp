@@ -9,7 +9,7 @@ void TM68k::ProcessInstruction() {
 
     u16 opcode = Read<u16>();
 
-    Process<O, I, O, O, I, I, I, O, O, I, I, I, O, O, O, I>(opcode, []() { // NOP
+    Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, []() { // NOP
         std::cout << "nop\n";
     });
 
