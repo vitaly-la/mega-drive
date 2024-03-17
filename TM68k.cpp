@@ -9,17 +9,19 @@ void TM68k::ProcessInstruction() {
 
     u16 opcode = Read<u16>();
 
-    Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, []() { // NOP
-        std::cout << "nop\n";
+    // TODO: return on success
+
+    Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0}, opcode, [this]() { // ORI to CCR
+        SR |= Read<u8>();
     });
 
-    switch (opcode) {
-    case 0x003c: // ORI to CCR
-        SR |= Read<u8>();
-        return;
-    case 0x007c: // ORI to SR
+    Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0}, opcode, [this]() { // ORI to SR
         SR |= Read<u16>();
-        return;
+    });
+
+    Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, [this]() {}); // NOP
+
+    switch (opcode) {
     case 0x023c: // ANDI to CCR
         SR &= Read<u8>();
         return;
