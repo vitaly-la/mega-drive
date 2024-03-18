@@ -9,42 +9,29 @@ void TM68k::ProcessInstruction() {
 
     u16 opcode = Read<u16>();
 
-    // TODO: return on success
+    if (Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0}, opcode, // ORI to CCR
+        [this](const TInstruction&) {
+            SR |= Read<u8>();
+        }
+    )) return;
 
-    Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0}, opcode, [this]() { // ORI to CCR
-        SR |= Read<u8>();
-    });
+    if (Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0}, opcode, // ORI to SR
+        [this](const TInstruction&) {
+            SR |= Read<u16>();
+        }
+    )) return;
 
-    Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0}, opcode, [this]() { // ORI to SR
-        SR |= Read<u16>();
-    });
+    if (Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, // NOP
+        [](const TInstruction&) {
+        }
+    )) return;
 
-    Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, [this]() {}); // NOP
-
-    switch (opcode) {
-    case 0x023c: // ANDI to CCR
-        SR &= Read<u8>();
-        return;
-    case 0x027c: // ANDI to SR
-        SR &= Read<u16>();
-        return;
-    case 0x0a3c: // EORI to CCR
-        SR ^= Read<u8>();
-        return;
-    case 0x0a7c: // EORI to SR
-        SR ^= Read<u16>();
-        return;
-    case 0x4e72: // STOP
-        SR = Read<u16>();
-        Status = EStatus::Stopped;
-        return;
-    }
-
-    if ((opcode & 0xffc0) == 0x4ec0) { // JMP
-        PC = Read<u32>();
-        // Other addressing modes
-        return;
-    }
+    if (Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0}, opcode, // STOP
+        [this](const TInstruction&) {
+            SR = Read<u16>();
+            Status = EStatus::Stopped;
+        }
+    )) return;
 
     throw std::runtime_error("Unsupported instruction.");
 }
