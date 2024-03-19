@@ -1,9 +1,8 @@
 #pragma once
 
-enum {
-    S = 2,
-    M = 3
-};
+constexpr int S = 2;
+constexpr int M = 3;
+constexpr int Xn = 4;
 
 enum struct ESize : u8 {
     Byte,
@@ -22,9 +21,21 @@ enum struct EMode : u8 {
     Other
 };
 
+enum struct EModeExt : u8 {
+    PCDisp = 2,
+    PCIdx = 3,
+    AbsShort = 0,
+    AbsLong = 1,
+    Imm = 4
+};
+
 struct TInstruction {
     ESize size;
     EMode mode;
+    union {
+        u8 reg;
+        EModeExt modeExt;
+    };
 };
 
 template<size_t Size>
@@ -65,6 +76,17 @@ bool Process(const std::array<int, Size>& mask, u16 opcode, std::function<void(c
             u8 mode = (bitset[i] << 2) | (bitset[i + 1] << 1) | bitset[i + 2];
             if (mode < 8) {
                 instruction.mode = EMode{mode};
+            } else {
+                return false;
+            }
+            i += 3;
+            continue;
+        }
+
+        case Xn: {
+            u8 reg = (bitset[i] << 2) | (bitset[i + 1] << 1) | bitset[i + 2];
+            if (reg < 8) {
+                instruction.reg = reg;
             } else {
                 return false;
             }

@@ -21,6 +21,12 @@ void TM68k::ProcessInstruction() {
         }
     )) return;
 
+    if (Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, S, M, Xn}, opcode, // ORI
+        [this](const TInstruction& instruction) {
+            // TODO: implement ORI
+        }
+    )) return;
+
     if (Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, // NOP
         [](const TInstruction&) {
         }
