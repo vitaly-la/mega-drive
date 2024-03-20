@@ -10,15 +10,20 @@ struct TM68k {
     EStatus Status;
     TMemory Memory;
     std::map<u32, std::string> Instructions;
-    u32 Reg[16];
+    u32 D[8];
+    u32 A[8];
     u32 SSP;
     u32 PC;
-    u16 SR;
+    union {
+        u16 SR;
+        u8 CCR;
+    };
 
     TM68k(TMemory memory, const std::string& asmFile) : 
         Status{EStatus::Init},
         Memory{std::move(memory)},
-        Reg{},
+        D{},
+        A{},
         SR{}
     {
         ReadInstructions(asmFile);

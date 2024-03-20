@@ -46,56 +46,55 @@ bool Process(const std::array<int, Size>& mask, u16 opcode, std::function<void(c
 
     for (auto part : mask) {
         switch (part) {
+            case 0:
+                if (bitset[i] == 0) {
+                    ++i;
+                    continue;
+                }
+                return false;
 
-        case 0:
-            if (bitset[i] == 0) {
-                ++i;
+            case 1:
+                if (bitset[i] == 1) {
+                    ++i;
+                    continue;
+                }
+                return false;
+
+            case S: {
+                u8 size = (bitset[i] << 1) | bitset[i + 1];
+                if (size < 3) {
+                    instruction.size = ESize{size};
+                } else {
+                    return false;
+                }
+                i += 2;
                 continue;
             }
-            return false;
 
-        case 1:
-            if (bitset[i] == 1) {
-                ++i;
+            case M: {
+                u8 mode = (bitset[i] << 2) | (bitset[i + 1] << 1) | bitset[i + 2];
+                if (mode < 8) {
+                    instruction.mode = EMode{mode};
+                } else {
+                    return false;
+                }
+                i += 3;
                 continue;
             }
-            return false;
 
-        case S: {
-            u8 size = (bitset[i] << 1) | bitset[i + 1];
-            if (size < 3) {
-                instruction.size = ESize{size};
-            } else {
-                return false;
+            case Xn: {
+                u8 reg = (bitset[i] << 2) | (bitset[i + 1] << 1) | bitset[i + 2];
+                if (reg < 8) {
+                    instruction.reg = reg;
+                } else {
+                    return false;
+                }
+                i += 3;
+                continue;
             }
-            i += 2;
-            continue;
-        }
 
-        case M: {
-            u8 mode = (bitset[i] << 2) | (bitset[i + 1] << 1) | bitset[i + 2];
-            if (mode < 8) {
-                instruction.mode = EMode{mode};
-            } else {
-                return false;
-            }
-            i += 3;
-            continue;
-        }
-
-        case Xn: {
-            u8 reg = (bitset[i] << 2) | (bitset[i + 1] << 1) | bitset[i + 2];
-            if (reg < 8) {
-                instruction.reg = reg;
-            } else {
-                return false;
-            }
-            i += 3;
-            continue;
-        }
-
-        default:
-            throw std::runtime_error("Unknown opcode mask.");
+            default:
+                throw std::runtime_error("Unknown opcode mask.");
         }
     }
 

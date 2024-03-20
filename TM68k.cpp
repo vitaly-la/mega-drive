@@ -11,7 +11,7 @@ void TM68k::ProcessInstruction() {
 
     if (Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0}, opcode, // ORI to CCR
         [this](const TInstruction&) {
-            SR |= Read<u8>();
+            CCR |= Read<u8>();
         }
     )) return;
 
@@ -21,15 +21,25 @@ void TM68k::ProcessInstruction() {
         }
     )) return;
 
+    // TODO: set CCR, check endianness
     if (Process(std::array{0, 0, 0, 0, 0, 0, 0, 0, S, M, Xn}, opcode, // ORI
         [this](const TInstruction& instruction) {
-            // TODO: implement ORI
+            switch (instruction.size) {
+                case ESize::Byte: {
+                    u8 data = Read<u8>();
+                    switch (instruction.mode) {
+                        case EMode::Dn:
+                            D[instruction.reg] |= data;
+                            break;
+                    }
+                    break;
+                }
+            }
         }
     )) return;
 
     if (Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1}, opcode, // NOP
-        [](const TInstruction&) {
-        }
+        [](const TInstruction&) {}
     )) return;
 
     if (Process(std::array{0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0}, opcode, // STOP
